@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
     name = "tennismodelling",
     author = "Joss Peters",
-    description = "Probabilistic modelling framework for predicting the outcome of tennis matches",
+    description = "Probabilistic modelling framework for predicting the outcomes of tennis matches",
     url = "https://github.com/jptrs93/TennisPredictionProject",
     packages=['tennismodelling']
 )
