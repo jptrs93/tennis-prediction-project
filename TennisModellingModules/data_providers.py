@@ -6,9 +6,8 @@ This module provides classes for loading and iterating over the data set. Assume
 """
 
 import os
-from datetime import date, timedelta, datetime
+from datetime import datetime
 import csv
-from TennisModellingModules import output as out
 
 
 class CoarseDataProvider(object):
@@ -135,7 +134,8 @@ class VFineDataProvider(CoarseDataProvider):
     """Steps per every round of every tournament. So no player ever plays twice within a step."""
 
     def updateE(self):
-        """Update index E based on current index M"""
+        """Update index E.
+        """
         round = self.round_sort_order[self.data[self.m][29]]
         for i, row in enumerate(self.data[self.m:]):
             if row[5] > self.data[self.m][5] or self.round_sort_order[row[29]] != round:
@@ -163,74 +163,11 @@ class ThreeYearWindowProvider(VFineDataProvider):
         self.updateE()
 
     def updateS(self):
+        """
+        Update index S.
+        """
         current_date = self.data[self.e][5]
         for i, row in enumerate(self.data[self.s:]):
             if current_date - row[5] < 1096:
                 self.s += i
                 break
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'----------------------------------------------------------------------------------------------------------------------'
-
-'Other testing and stuff'
-
-'----------------------------------------------------------------------------------------------------------------------'
-def create_predictions_file():
-    """"Creates a file containing only the subset of matches which predictions are to be made for.
-    """
-    provider = ThreeYearWindowProvider()
-    output = []
-    count = 0
-    i = 0
-    for s, m ,e in provider:
-        i+=1
-        if i % 50 ==0:
-            print(i)
-        for row in provider.data[m:e]:
-            p1 = row[10]
-            p2 = row[20]
-            p1c = 0
-            p2c = 0
-            for rowi in provider.data[s:m]:
-                if p1 in [rowi[10],rowi[20]]:
-                    p1c+=1
-                if p2 in [rowi[10],rowi[20]]:
-                    p2c+=1
-            if p1c > 0 and p2c > 0 and row[4] in ['A','F','G','M']:
-                output += [[row[-1], row[1], row[2], row[10], row[20], p1c, p2c,row[16],row[26]]]
-                count +=1
-    out.append_csv_rows(output,'prediction_subset_keys2.csv')
-    print(count)
-
-
-def test():
-    """Test the data providers.
-    """
-    # provider2 = VFineDataProvider(data_file ='atp_and_challenger_data.csv')
-    provider2 = ThreeYearWindowProvider()
-    for i, item in enumerate(provider2):
-        print(item,i,provider2.data[item[2]][-1])
-
-# create_predictions_file()
-# test()

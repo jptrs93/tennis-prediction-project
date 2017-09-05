@@ -16,12 +16,32 @@ import numpy as np
 
 '----------------------------------------------------------------------------------------------------------------------'
 
-def game_chance(serveChance): # closed form game chance
+
+def game_chance(serveChance):
+    """
+    Returns the probability of a player winning a service game based upon the probability of them winning a point
+    on their serve. Assumes points are independent and identically distributed.
+
+    Args:
+        serveChance (float [0,1]) : Probability of the serving player winning a point
+    Returns
+        gameChance (float [0,1]) : Probability of the serving player winning a game
+    """
     return (serveChance**4)+4*(serveChance**4)*((1-serveChance)**1)+10*(serveChance**4)*((1-serveChance)**2)+\
            20*(serveChance**3)*((1-serveChance)**3)*(serveChance**2)*(1/(1-(2*serveChance*(1-serveChance))))
 
 
-def tie_chance(p1serveChance, p2serveChance):    # closed form tie break chance
+def tie_chance(p1serveChance, p2serveChance):
+    """
+    Returns the probability a player winning a tie break based upon the probabilities of both players winning a
+    point on their serve. Assumes points are independent and identically distributed.
+    
+    Args:
+        p1serveChance (float [0,1]) : Probability of player 1 winning a point on their serve
+        p2serveChance (float [0,1]) : Probability of player 2 winning a point on their serve
+    Returns:
+        p1tieChance (float [0,1]) : Probability of player 1 winning a tie break
+    """
     return (p1serveChance**3)*((1-p2serveChance)**4)+4*(p1serveChance**4)*((1-p2serveChance)**3)*p2serveChance+\
         3*(p1serveChance**3)*((1-p2serveChance)**4)*(1-p1serveChance)+6*(p1serveChance**5)*((1-p2serveChance)**2)*(p2serveChance**2)+\
         16*(p1serveChance**4)*((1-p2serveChance)**3)*(1-p1serveChance) *(p2serveChance)+\
@@ -51,7 +71,18 @@ def tie_chance(p1serveChance, p2serveChance):    # closed form tie break chance
         (p1serveChance*(1-p2serveChance))*(1/(1-(p1serveChance*p2serveChance+(1-p1serveChance)*(1-p2serveChance))))
 
 
-def set_chance(p1Tie, p1Game,p2Game):    # closed form set chance
+def set_chance(p1Tie, p1Game,p2Game):
+    """
+    Returns the probability a player winning a set based upon the probabilities of both players winning service games 
+    and a tie break. Assumes games are independent and identically distributed.
+
+    Args:
+        p1Tie (float [0,1]) : Probability of player 1 winning a tie break
+        p1Game (float [0,1]) : Probability of player 1 winning a game on their serve
+        p2Game (float [0,1]) : Probability of player 1 winning a game on their serve
+    Returns:
+        p1tieChance (float [0,1]) : Probability of player 1 winning a set break
+    """
     return (p1Game**3)*((1-p2Game)**3)+3*(p1Game**4)*((1-p2Game)**2)*p2Game+3*(p1Game**3)*((1-p2Game)**3)*(1-p1Game)+\
         3*(p1Game**4)*((1-p2Game)**2)*(p2Game**2)+12*(p1Game**3)*((1-p2Game)**3)*(1-p1Game)*(p2Game)+\
         6*(p1Game**2)*((1-p2Game)**4)*((1-p1Game)**2)+4*(p1Game**5)*((1-p1Game)**0)*((1-p2Game)**1)*(p2Game**3)+\
@@ -69,14 +100,35 @@ def set_chance(p1Tie, p1Game,p2Game):    # closed form set chance
 
 
 def match_chance_sets(p1set,no_sets=3): # closed form match chance from game probabilities
+    """
+    Returns the probability a player winning a match based upon the probabilities of a player winning a set.
+    Assumes sets are independent and identically distributed.
+
+    Args:
+        p1set (float [0,1]) : Probability of player 1 winning a set
+        no_sets (integer) : 5 or 3 - the number of sets the match is out of
+    Returns:
+        p1Match (float [0,1]) : Probability of player 1 winning the match
+    """
     if no_sets==3:
         return (p1set**2)+2*(p1set**2)*(1-p1set)
-    else: # otherwise assume 5 set match
+    else:    # otherwise assume 5 set match
         return (p1set**3)+3*(p1set**3)*(1-p1set)+6*(p1set**3)*((1-p1set)**2)
 
 
-def match_chance_games(p1Game,p2Game,no_sets=3): # closed form match chance from game probabilities
-    p1Tie = (p1Game + 1- p2Game)/2.
+def match_chance_games(p1Game,p2Game,no_sets=3):
+    """
+    Returns the probability a player winning a match based upon the probabilities either player winning a game on 
+    their serve. Assumes games are independent and identically distributed.
+
+    Args:
+        p1Game (float [0,1]) : Probability of player 1 winning a game on their serve
+        p2Game (float [0,1]) : Probability of player 1 winning a game on their serve
+        no_sets (integer) : 5 or 3 - the number of sets the match is out of
+    Returns:
+        p1Match (float [0,1]) : Probability of player 1 winning the match
+    """
+    p1Tie = (p1Game + 1- p2Game)/2. # average and use as tiebreak chance
     p1set = set_chance(p1Tie,p1Game,p2Game)
     if no_sets==3:
         return (p1set**2)+2*(p1set**2)*(1-p1set)
@@ -84,7 +136,18 @@ def match_chance_games(p1Game,p2Game,no_sets=3): # closed form match chance from
         return (p1set**3)+3*(p1set**3)*(1-p1set)+6*(p1set**3)*((1-p1set)**2)
 
 
-def match_chance(p1serve,p2serve,no_sets=3): # closed form match chance
+def match_chance(p1serve,p2serve,no_sets=3):
+    """
+    Returns the probability a player winning a match based upon the probabilities either player winning a point on 
+    their serve. Assumes points are independent and identically distributed.
+
+    Args:
+        p1serveChance (float [0,1]) : Probability of player 1 winning a point on their serve
+        p2serveChance (float [0,1]) : Probability of player 2 winning a point on their serve
+        no_sets (integer) : 5 or 3 - the number of sets the match is out of
+    Returns:
+        p1Match (float [0,1]) : Probability of player 1 winning the match
+    """
     p1Game = game_chance(p1serve)
     p2Game = game_chance(p2serve)
     p1Tie = tie_chance(p1serve,p2serve)
@@ -102,11 +165,19 @@ def match_chance(p1serve,p2serve,no_sets=3): # closed form match chance
 '----------------------------------------------------------------------------------------------------------------------'
 
 
-def sim_game(sc):   # outcome of a game
+def sim_game(p1serve):
+    """
+    Simulates a tennis game.
+    
+    Args:
+        p1serve (float [0,1]) : Probability of the serving player winning a point
+    Returns
+        outcome (bool) : Whether the server won the game
+    """
     p1=0
     p2=0
     while(1):
-        if (np.random.uniform(0, 1) < sc):
+        if (np.random.uniform(0, 1) < p1serve):
             p1+=1
         else:
             p2+=1
@@ -116,7 +187,16 @@ def sim_game(sc):   # outcome of a game
             return 0
 
 
-def sim_tie(p1serve,p2serve):  # outcome of a tie break, assumes player 1 serves first
+def sim_tie(p1serve,p2serve):
+    """
+    Simulates a tie break.
+
+    Args:
+        p1serve (float [0,1]) : Probability of player 1 winning a point on their serve
+        p2serve (float [0,1]) : Probability of player 2 winning a point on their serve
+    Returns
+        outcome (bool) : Whether the player 1 won or lost the tie break
+    """
     p1=0
     p2=0
     serve_switch = 1
@@ -145,10 +225,19 @@ def sim_tie(p1serve,p2serve):  # outcome of a tie break, assumes player 1 serves
                 sc = p1serve
 
 
-def sim_set(p1serve,p2serve):   # outcome of a set
+def sim_set(p1serve,p2serve):
+    """
+    Simulates a set.
+
+    Args:
+        p1serve (float [0,1]) : Probability of player 1 winning a point on their serve
+        p2serve (float [0,1]) : Probability of player 2 winning a point on their serve
+    Returns
+        outcome (bool) : Whether the player 1 won or lost the set
+    """
     p1=0
     p2=0
-    sc = p1serve    # Player 1 start serving
+    sc = p1serve    # Assume player 1 starts serving
     while(1):
         if(sc == p1serve):
             w = sim_game(sc)
@@ -168,7 +257,17 @@ def sim_set(p1serve,p2serve):   # outcome of a set
             return sim_tie(p1serve,p2serve)
 
 
-def sim_m(p1serve,p2serve,no_sets=3):   # outcome of a game
+def sim_m(p1serve,p2serve,no_sets=3):
+    """
+    Simulates a match.
+
+    Args:
+        p1serve (float [0,1]) : Probability of player 1 winning a point on their serve
+        p2serve (float [0,1]) : Probability of player 2 winning a point on their serve
+        no_sets (integer) : 5 or 3 - the number of sets the match is out of
+    Returns
+        outcome (bool) : Whether the player 1 won or lost the match
+    """
     p1=0
     p2=0
     while(1):
@@ -182,6 +281,17 @@ def sim_m(p1serve,p2serve,no_sets=3):   # outcome of a game
 
 
 def sim_match(p1serve,p2serve, no_loops=2000, no_sets=3):
+    """
+    Simulates a large number of matches and averages the outcome to give the probability of a player winning a match.
+
+    Args:
+        p1serve (float [0,1]) : Probability of player 1 winning a point on their serve
+        p2serve (float [0,1]) : Probability of player 2 winning a point on their serve
+        no_sets (integer) : 5 or 3 - the number of sets the match is out of
+        no_loops (integer) : The number of trials to make
+    Returns
+        MatchProb (float [0,1]) : Probability of player 1 winning the match
+    """
     count =0
     for i in range(no_loops):
         count += sim_m(p1serve,p2serve,no_sets)
@@ -190,7 +300,7 @@ def sim_match(p1serve,p2serve, no_loops=2000, no_sets=3):
 
 '----------------------------------------------------------------------------------------------------------------------'
 
-'CROSS CHECK'
+'Test to compare simulated against closed form'
 
 '----------------------------------------------------------------------------------------------------------------------'
 

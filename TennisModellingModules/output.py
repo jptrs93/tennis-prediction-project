@@ -50,16 +50,29 @@ def append_csv_rows(rows, file_name):
 
 
 class OutputProcessor(object):
-    """Class for processing model output files."""
+    """Class for processing model output files.
+    TODO: tidy - structure is messy, parts are not concise, repeated chunks of code etc...
+    """
 
-    def __init__(self, min_matches=0, year_start=2000, year_end=2020, odds=3):
-
+    def __init__(self, min_matches=0, year_start=2013, year_end=2020, odds=3):
+        """
+        Args:
+            min_matches (integer) : Minimum number of matches
+            year_start (integer) : Start year of range of predictions to consider (inclusive)
+            year_end (integer) : End year of range of predictions to consider (exclusive)
+            odds (integer) : Odds to compare the model against. 1 for averaged bookmaker odds, 2 for pinnacle only odds,
+                             3 for bet365 only odds, 4 for betfair exchange odds.
+        """
         self.pred_keys = self.get_keys(min_matches,year_start,year_end)
         self.get_odds(odds)
 
-    def get_summary_stats(self,folder_location,files=  False):
-        """Process's output files to provide summary stats for all the
-        models with output files in a given folder"""
+    def get_summary_stats(self,folder_location, files=False):
+        """Process's output files in a folder and print a performance summary of predictions for each output file.
+
+        Args:
+            folder_location (string) : Path to folder location
+            files (bool) : Set true if instead of a folder path a list of files is provided as the first argument.
+        """
         if files:
             csv_files = folder_location
         else:
@@ -90,9 +103,10 @@ class OutputProcessor(object):
                 pass
 
     def get_keys(self,min_matches, year_start, year_end):
-        """return the subset of matches which the model predictions will compared against
+        """Returns the subset of matches which the model predictions will be scored against.
+
         Args:
-            min_matches (int) : minimum matches for each player in last 12 months
+            min_matches (int) : minimum matches for each player
             year_start  Year start range (inclusive)
             year_end : Year end range (exclusive)
         Returns:
@@ -107,11 +121,17 @@ class OutputProcessor(object):
             if int(row[5]) > min_matches-1 and int(row[6]) > min_matches-1 and yr >= year_start and yr < year_end:
                 key = row[0][:4] + row[1] + row[3] + row[4]
                 pred_keys[key] = -1
-        print('no matches {0}'.format(len(pred_keys)))
         return pred_keys
 
     def get_odds(self, type = 1):
-        """Adds the odds to the key dictionary from a separate odds file. Type 1 for pinnacle, 2 bet365 or 3 averaged"""
+        """Fetches the betting odds for the subset of matches which are being considered.
+
+        Args:
+            type (integer) : Type of odds to compare the model against. 1 for averaged bookmaker odds, 2 for pinnacle
+                             only odds, 3 for bet365 only odds, 4 for betfair exchange odds.
+        Returns:
+
+        """
         if type < 4:
             data_path = os.path.join(os.environ['ML_DATA_DIR'], 'BookieOdds_2004to2017.csv')
             rows = [row for row in csv.reader(open(data_path))]
@@ -141,28 +161,14 @@ class OutputProcessor(object):
                     except:
                         self.pred_keys[key] = -1
 
-    def get_odds_probs(self, type = 1):
-        """returns bookmaker probabilities"""
-        data_path = os.path.join(os.environ['ML_DATA_DIR'], 'BookieOdds_2004to2017.csv')
-        probs = []
-        rows = [row for row in csv.reader(open(data_path))]
-        rows.sort(key=lambda row: (row[5]))
-        for row in rows:
-            key = row[5][:4] + row[1] + row[10] + row[20]
-            if key in self.pred_keys:
-                try:
-                    if type == 1:
-                        probs += [1./float(row[53]) /(1./float(row[53])+1./float(row[54]))]
-                    elif type ==2:
-                        probs += [1./float(row[51]) /(1./float(row[51])+1./float(row[52]))]
-                    elif type ==3:
-                        probs += [1./float(row[49]) /(1./float(row[49])+1./float(row[50]))]
-                except:
-                    pass
-        return probs
-
     def get_stats(self, path):
-        """Return the statistics from given file"""
+        """Evaluates and returns the performance statistics for the predictions in an output file.
+
+        Args:
+            path (string) : Path to output file
+        Returns:
+            statistics (tuple) : Prediction performance statistics
+        """
         accuracy = [0, 0]
         av_prob = [0, 0]
         log_prob = [0, 0]
@@ -226,7 +232,11 @@ class OutputProcessor(object):
         return accuracy, av_prob, log_prob, profit, p_score, probs, years
 
     def get_bookmaker_baseline(self):
+        """Evaluates and returns the performance statistics of the bookmaker implied probabilities.
 
+        Returns:
+            statistics (tuple) : Prediction performance statistics
+        """
         accuracy = [0, 0]
         av_prob = [0, 0]
         log_prob = [0, 0]
@@ -266,8 +276,12 @@ class OutputProcessor(object):
         return accuracy, av_prob, log_prob, profit, p_score, probs_list
 
     def get_atp_ranking_baseline(self):
+        """Evaluates and returns the performance statistics for predictions based upon atp rankings.
 
-        pred_keys = {}
+        Returns:
+            statistics (tuple) : Prediction performance statistics
+        """
+
         keys_file = os.path.join(os.environ['ML_DATA_DIR'], 'ATP_only_2013to2017.csv')
         rows = [row for row in csv.reader(open(keys_file))]
         rows.sort(key=lambda row: (row[0]))
@@ -336,6 +350,8 @@ class OutputProcessor(object):
         return accuracy, av_prob, log_prob, profit, p_score, probs_list
 
     def print_baselines(self):
+        """Prints the performance statisitics of the model baselines: bookmakers and atp rankings.
+        """
         print('---'*60)
         print_format = "{0:<65}|{1:<15}|{2:<15}|{3:<15}|{4:<15}|{5:<15}|{6:<15}|{7:<15}|{8:<15}"
         header = ['Model','Acc(m1)','Av Prob (m2)', 'Av ln(p) (m3)', 'ROI (m4)','No. Pred','No. Bets','% Bets Won','P-score']
@@ -349,7 +365,14 @@ class OutputProcessor(object):
         output = ['ATP Rankings', float(accuracy[0])/accuracy[1], av_prob[0]/av_prob[1], log_prob[0]/log_prob[1], profit[0]/profit[1], accuracy[1], profit[1], float(profit[2])/profit[1],float(p_score[0])/p_score[1]]
         print(print_format.format(*output))
 
-    def make_averaged_file(self,files, outfile, folders = []):
+    def make_averaged_file(self,files, outfile):
+        """
+        Creates a new output file with averaged predictions from other models.
+
+        Args:
+            files (list) : List of output files to average predictions from
+            outfile (string) : Path to save averaged output file to
+        """
         dict = {}
         var = {}
         for i, file in enumerate(files):
@@ -380,6 +403,18 @@ class OutputProcessor(object):
 
     @staticmethod
     def get_profit(prob,w_odds,l_odds, edge_margin = 0):
+        """Calculates the profit based the odds and models predictions.
+
+        Args:
+            prob (float) : Models predicted probability for winning player
+            w_odds (float) : Odds for winning player
+            l_odds (float) : Odds for losing player
+            edge_margin (float) : Probabilty edge required to place a bet
+
+        Returns:
+            profit (float) : Profit made (returns zero if no bet would have been placed)
+        """
+
         diffL = (1. - prob) - (1. / l_odds)
         diffW = prob - (1. / w_odds)
         if diffL > edge_margin and diffL > diffW:
