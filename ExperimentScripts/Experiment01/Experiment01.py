@@ -4,8 +4,8 @@ Half Life grid search for standard exponential decay function based on combined 
 No regularisation. Evaluates each model in its own process.
 
 """
-from TennisModellingModules import models
-from TennisModellingModules import optimisers
+from tennismodelling import models
+from tennismodelling import optimisers
 import multiprocessing
 
 # Output files

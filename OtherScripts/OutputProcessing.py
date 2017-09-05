@@ -4,7 +4,7 @@ Gets a performance summary of models based on their output files.
 
 """
 
-from TennisModellingModules import output as out
+from tennismodelling import output as out
 
 folders = ["../Outputs/Experiment01",
            "../Outputs/Experiment02",

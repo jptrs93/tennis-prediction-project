@@ -4,9 +4,9 @@ L2 regularisation constant grid search for combined point and game Bradley-Terry
 function (half life 240 days). Evaluates each model in its own process.
 
 """
-from TennisModellingModules import models
-from TennisModellingModules import data_providers
-from TennisModellingModules import optimisers
+from tennismodelling import models
+from tennismodelling import data_providers
+from tennismodelling import optimisers
 import multiprocessing
 
 # Output files

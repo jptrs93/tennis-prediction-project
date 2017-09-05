@@ -4,9 +4,9 @@ Alternative Decay function hyper parameter grid search based on combined point a
 No regularisation. Evaluates each model in its own process. 
 
 """
-from TennisModellingModules import models
-from TennisModellingModules import data_providers
-from TennisModellingModules import optimisers
+from tennismodelling import models
+from tennismodelling import data_providers
+from tennismodelling import optimisers
 import multiprocessing
 
 # Output files

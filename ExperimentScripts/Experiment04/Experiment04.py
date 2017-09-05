@@ -4,10 +4,10 @@ Free parameter point model and combined point and game model. Fitted with and wi
 Standard recency weighting function (half life 240 days). Evaluates each model in its own process.
 
 """
-from TennisModellingModules import models
-from TennisModellingModules import optimisers
+from tennismodelling import models
+from tennismodelling import optimisers
 import multiprocessing
-from TennisModellingModules import initialisers
+from tennismodelling import initialisers
 
 # Output files
 output_files = ["../../Outputs/Experiment04/FreeParamPointGame_reg0_noBias.csv",

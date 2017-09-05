@@ -4,11 +4,11 @@ This module provides classes which implement various probabilistic models for pr
 
 """
 
-from TennisModellingModules import data_providers
-from TennisModellingModules import output as out
-from TennisModellingModules import markov_chain as mcm
-from TennisModellingModules import optimisers
-from TennisModellingModules import initialisers
+from tennismodelling import data_providers
+from tennismodelling import output as out
+from tennismodelling import markov_chain as mcm
+from tennismodelling import optimisers
+from tennismodelling import initialisers
 import numpy as np
 import csv
 

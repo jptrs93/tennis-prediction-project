@@ -5,10 +5,10 @@ function (half life 240 days). Evaluates each model in its own process.
 
 """
 
-from TennisModellingModules import models
-from TennisModellingModules import optimisers
+from tennismodelling import models
+from tennismodelling import optimisers
 import multiprocessing
-from TennisModellingModules import initialisers
+from tennismodelling import initialisers
 
 # Output files
 output_files = ["../../Outputs/Experiment05/FreeParamPointGame_reg0_000005.csv",

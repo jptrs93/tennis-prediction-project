@@ -7,9 +7,9 @@ a pool of 25 processes.
 """
 
 import multiprocessing as mp
-from TennisModellingModules import output as out
-from TennisModellingModules import models
-from TennisModellingModules import optimisers
+from tennismodelling import output as out
+from tennismodelling import models
+from tennismodelling import optimisers
 import Queue
 
 print('starting')

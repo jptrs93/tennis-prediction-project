@@ -6,8 +6,8 @@ Pre-processes original data to add additional columns with information required 
 
 import csv
 import os
-from TennisModellingModules import output as out
-from TennisModellingModules import markov_chain as mcm
+from tennismodelling import output as out
+from tennismodelling import markov_chain as mcm
 
 
 def get_game_percentages(row):

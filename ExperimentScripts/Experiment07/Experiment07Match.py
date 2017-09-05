@@ -6,10 +6,10 @@ process.
 
 """
 
-from TennisModellingModules import models
-from TennisModellingModules import optimisers
+from tennismodelling import models
+from tennismodelling import optimisers
 import multiprocessing
-from TennisModellingModules import data_providers
+from tennismodelling import data_providers
 
 # Output files
 output_files = ["../../Outputs/Experiment07/Match/BradleyMatchCorrelated_Drift_0_9_Prior0_50.csv",

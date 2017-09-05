@@ -6,11 +6,11 @@ evaluation across 10 cores.
 """
 
 import multiprocessing as mp
-from TennisModellingModules import output as out
-from TennisModellingModules import models
-from TennisModellingModules import optimisers
+from tennismodelling import output as out
+from tennismodelling import models
+from tennismodelling import optimisers
 import Queue   # Change to 'queue' for python 3
-from TennisModellingModules import initialisers
+from tennismodelling import initialisers
 
 # Output file
 output_file = "../../Outputs/Experiment06/Drift0_9Prior1.csv"
