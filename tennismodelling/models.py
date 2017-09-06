@@ -75,7 +75,7 @@ class Model(object):
             iteration (int) : Number of iterations to skip
         """
         for i in range(iteration):
-            _ = self.next()
+            _ = self.data_provider.next()
 
     def run(self,output_file):
         """Run the model, writing predictions to an output file.
