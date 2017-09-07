@@ -564,7 +564,7 @@ class BradleyTerryVariationalInference(BaseOptimiser):
 
         return j2, mubar, sigma2Bar
 
-    def optimise(self, w_init= None, prior = None, max_iter =100, display=False):
+    def optimise(self, w_init= None, prior = None, max_iter =200, display=False):
         """Optimise the parameters of the approximate posterior using quasi-Newton method.
 
         Args:
@@ -585,7 +585,7 @@ class BradleyTerryVariationalInference(BaseOptimiser):
         else:
             self.Prior_mean = prior[0]
             self.Prior_Prec = np.linalg.inv(prior[1])
-        print('here')
+
         # Initialise posterior to prior
         if w_init is None:
             w = self.initialise_w()

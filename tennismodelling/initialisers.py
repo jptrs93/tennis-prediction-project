@@ -131,8 +131,13 @@ class JointOptTimeSeriesInitialiser():
 
 class BradleyTerryVariationalInferenceInitialiser(object):
 
-    def __init__(self):
+    def __init__(self, prior_var=1.):
+        """
+        Args:
+             prior_var (scalar) : Prior variance of skills used in model
+        """
 
+        self.prior_var = prior_var
         self.player_means = {'Hard': {}, 'Clay': {}, 'Carpet': {}, 'Grass': {}}         # stores player skill means
         self.player_variances = {'Hard': {}, 'Clay': {}, 'Carpet': {}, 'Grass': {}}     # stores player skill variances
 
@@ -147,7 +152,7 @@ class BradleyTerryVariationalInferenceInitialiser(object):
             tuple : Initialised mean and covariance
         """
         means = np.array([self.player_means[surface].get(player,0) for player in players])
-        vars = np.array([self.player_variances[surface].get(player,1) for player in players])
+        vars = np.array([self.player_variances[surface].get(player,self.prior_var) for player in players])
         V = np.diag(vars)
         return [means, V]
 

@@ -1,7 +1,7 @@
 """
 
-L2 regularisation constant grid search for combined point and game Bradley-Terry model. Standard recency weighting
-function (half life 240 days). Evaluates each model in its own process.
+Prior variance grid search for combined point and game Bradley-Terry model fitted using a Bayesian approach with
+diagonal Covariance. Standard recency weighting function (half life 240 days). Evaluates each model in its own process.
 
 """
 from tennismodelling import models
@@ -24,51 +24,51 @@ output_files = ["../../Outputs/Experiment11/DiagonalCovariance/PointGame_Prior00
                 "../../Outputs/Experiment11/DiagonalCovariance/PointGame_Prior50_00.csv"]
 
 # Models
-models = [models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+models = [models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=0.5),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=0.5,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False)),
-          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=1.),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=1.,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False)),
-          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=1.5),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=1.5,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False)),
-          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=2.),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=2.,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False)),
-          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=2.5),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=2.5,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False)),
-          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=3.),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=3.,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False)),
-          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=4.),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=4.,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False)),
-          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=5.),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=5.,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False)),
-          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=10.),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=10.,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False)),
-          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=15.),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=15.,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False)),
-          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=20.),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=20.,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False)),
-          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(),
+          models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=50.),
                                             optimiser=optimisers.BradleyTerryVariationalInference(prior_var=50.,
                                                                                                   use_correlations=False,
                                                                                                   use_samples=False))]
