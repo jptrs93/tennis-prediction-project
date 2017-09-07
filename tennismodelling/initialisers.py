@@ -89,13 +89,12 @@ class FreeParameterInitialiser(BradleyTerryInitialiser):
             surface (string) : Surface being modelled
         """
         n= len(players)
-        for i, player in enumerate(players):
-            self.players[surface][player] = [w[i],w[i+n]]
+
 
 
 class JointOptTimeSeriesInitialiser():
     """Class for initialising parameters in joint optimisation time series Bradley-Terry model based on previous fit.
-    NOTE: unfinished."""
+    NOTE: unfinished -currently only initialises mean not covariance."""
 
     def __init__(self):
         self.players = {}       # Tracker of player name to indexes in m and V
@@ -109,17 +108,17 @@ class JointOptTimeSeriesInitialiser():
             players (list) : List of players being modelled
             surface (string) : Surface being modelled
         Returns:
-            w (vector) : Initialised model parameters
+            tuple : Initialised mean and covariance
         """
         params = [self.players.get(player,0) for player in players]
         means = np.array(params + params + params +params)
-        return means
+        return [means, None]
 
     def update_parameters(self, w, players, surface):
         """Updates the stored parameters for players to be used as future initialisations.
 
         Args:
-            w (vector) : Vector of optimised parameters
+            w (tuple) : Tuple containing the mean and covariance of approximate posterior
             players (list) : List of players being modelled
             surface (string) : Surface being modelled
         """
@@ -130,10 +129,41 @@ class JointOptTimeSeriesInitialiser():
 
 
 
+class BradleyTerryVariationalInferenceInitialiser(object):
+
+    def __init__(self):
+
+        self.player_means = {'Hard': {}, 'Clay': {}, 'Carpet': {}, 'Grass': {}}         # stores player skill means
+        self.player_variances = {'Hard': {}, 'Clay': {}, 'Carpet': {}, 'Grass': {}}     # stores player skill variances
 
 
+    def get_parameters(self, players, surface):
+        """Returns parameters to initialise optimisation with.
 
+        Args:
+            players (list) : List of players being modelled
+            surface (string) : Surface being modelled
+        Returns:
+            tuple : Initialised mean and covariance
+        """
+        means = np.array([self.player_means[surface].get(player,0) for player in players])
+        vars = np.array([self.player_variances[surface].get(player,1) for player in players])
+        V = np.diag(vars)
+        return [means, V]
 
+    def update_parameters(self, w,players, surface):
+        """Updates the stored parameters for players to be used as future initialisations.
+
+        Args:
+            w (tuple) : Tuple containing the mean and covariance of approximate posterior
+            players (list) : List of players being modelled
+            surface (string) : Surface being modelled
+        """
+        means= w[0]
+        V = w[1]
+        for i, player in enumerate(players):
+            self.player_means[surface][player] = means[i]
+            self.player_variances[surface][player] = V[i,i]
 
 
 
