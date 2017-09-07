@@ -6,7 +6,7 @@ This module provides classes which implement various probabilistic models for pr
 
 from tennismodelling import data_providers
 from tennismodelling import output as out
-from tennismodelling import markov_chain as mcm
+from tennismodelling import markovchain as mcm
 from tennismodelling import optimisers
 from tennismodelling import initialisers
 import numpy as np
@@ -53,7 +53,7 @@ class Model(object):
         if self.decay_type == 2:
             return min(self.half_life,self.half_life**(diff / 365.))/self.half_life
         elif self.half_life == 'inf':
-            return 1
+            return 1.
         else:
             return 0.5 ** (diff / float(self.half_life))
 

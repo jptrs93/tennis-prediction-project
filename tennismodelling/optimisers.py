@@ -564,10 +564,12 @@ class BradleyTerryVariationalInference(BaseOptimiser):
 
         return j2, mubar, sigma2Bar
 
-    def optimise(self, mean_init =  None, V_init = None, prior = None, max_iter =50, display=False):
+    def optimise(self, w_init= None, prior = None, max_iter =100, display=False):
         """Optimise the parameters of the approximate posterior using quasi-Newton method.
 
         Args:
+            w_init (list) : Containing [m, V] to initialise the posterior covariance and mean with. Or none if default
+                            should be used
             prior (list) : List, [m, V] containing the mean and covariance of the prior. If None a default
                            spherical prior will be constructed
             display (bool) : Whether to display the optimisation information
@@ -583,9 +585,14 @@ class BradleyTerryVariationalInference(BaseOptimiser):
         else:
             self.Prior_mean = prior[0]
             self.Prior_Prec = np.linalg.inv(prior[1])
-
+        print('here')
         # Initialise posterior to prior
-        w = self.initialise_w(mean_init,V_init)
+        if w_init is None:
+            w = self.initialise_w()
+        else:
+            mean_init = w_init[0]
+            V_init = w_init[1]
+            w = self.initialise_w(mean_init,V_init)
 
         # Optimise
         if display:
@@ -666,7 +673,7 @@ class BradleyTerryVariationalInference(BaseOptimiser):
             L[diag] = np.log(L[diag])
             return self.pack_params(m,L)
         else:
-            Vdiag = np.log(Vdiag)
+            Vdiag = np.log(V[diag])
             return self.pack_params(m,Vdiag)
 
     def unpack_params(self,w):
