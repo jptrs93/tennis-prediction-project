@@ -1,7 +1,8 @@
 """
 
-Joint optimisation Bradley-Terry time series model with drift of 0.9 and prior of 1. Runs the 1st quarter of the
-evaluation across 10 cores.
+Bradley-Terry model with infinite half life (no recency weighting), fitted using variational inference with a
+diagonal covariance and prior variance of 15. This model is for comparison to joint optimisation model as its
+results should be identical to joint optimisation model with 1 step. Runs the model across 10 processes.
 
 """
 
@@ -13,14 +14,18 @@ import Queue    # Change to 'queue' for python 3
 from tennismodelling import initialisers
 
 # Output file
-output_file = "../../Outputs/Experiment06/Drift0_9Prior1.csv"
+output_file = "../../Outputs/Experiment06/PointGameBradleyTerry_InfHalfLife_DiagonalCovariance_Prior15.csv"
 provider_model = models.Model()
 
 
 def worker(q_in, q_out):
     """Worker function to compute predictions of each iteration.
     """
-    model = models.JointOptTimeSeriesModelRefined(steps = 4, initialiser=initialisers.JointOptTimeSeriesInitialiser(),optimiser=optimisers.JointOptTimeSeriesRefinedBradleyTerryVariationalInference(steps=4,drift=0.9,tol = 1e-8, use_correlations=False, prior_var=1))
+    model = models.PointGameBradleyTerryModel(initialiser=initialisers.BradleyTerryVariationalInferenceInitialiser(prior_var=15.),
+                                              half_life='inf',
+                                              optimiser=optimisers.BradleyTerryVariationalInference(prior_var=15.,
+                                                                                                    use_correlations=False,
+                                                                                                    use_samples=False))
     while 1:
         try:
             item = q_in.get(block=True, timeout=300)  # If idle for 5 minutes assume job finished
@@ -38,8 +43,6 @@ if __name__ == "__main__":
 
     # Fill queues of work, with max 50 items in input queue
     for i, item in enumerate(provider_model.data_provider):
-        if i > 450:
-            break
         q_in.put(item)
         if i > 50:
             output_lines = q_out.get()

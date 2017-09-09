@@ -141,7 +141,6 @@ class BradleyTerryVariationalInferenceInitialiser(object):
         self.player_means = {'Hard': {}, 'Clay': {}, 'Carpet': {}, 'Grass': {}}         # stores player skill means
         self.player_variances = {'Hard': {}, 'Clay': {}, 'Carpet': {}, 'Grass': {}}     # stores player skill variances
 
-
     def get_parameters(self, players, surface):
         """Returns parameters to initialise optimisation with.
 

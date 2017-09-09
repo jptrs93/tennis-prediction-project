@@ -134,8 +134,6 @@ class OptimisationModel(Model):
             S (integer) : Starting index in data of relevant matches
             M (integer) : Ending index in data of relevant matches
             min_matches (integer) : The minimum number of matches a player must have played to be included
-        Returns:
-            pp : list of player names within index range S to M
         """
         players_list = {}
         for row in self.data_provider.data[S:M]:
@@ -223,7 +221,7 @@ class MatchBradleyTerryModel(OptimisationModel):
             # Optimise model parameters
             w_init = self.initialiser.get_parameters(self.players, surface)
             w = self.optimiser.optimise(w_init)
-            self.initialiser.update_parameters(w,self.players, surface)
+            self.initialiser.update_parameters(w, self.players, surface)
             self.Z = self.optimiser.get_probabilities(w)
             predictions += self.get_predictions(M,E)
         return predictions
@@ -429,8 +427,8 @@ class JointOptTimeSeriesModel(PointGameBradleyTerryModel):
             steps (integer) : The number of time periods to break the history of matches into
         """
         self.steps = steps
-        self.half_life = 'inf'
         super(JointOptTimeSeriesModel,self).__init__(*args, **kwargs)
+        self.half_life = 'inf'
 
     def extract_results(self, S, M):
         """Extracts results into matrix format to be used by optimiser for fitting the model parameters.
@@ -455,7 +453,6 @@ class JointOptTimeSeriesModel(PointGameBradleyTerryModel):
                     m = ind + S
                     break
                 m = ind + S + 1
-
             R1, W1 = super(JointOptTimeSeriesModel,self).extract_results(s, m)
             # Input the results into the result matrix
             if a < steps -1:

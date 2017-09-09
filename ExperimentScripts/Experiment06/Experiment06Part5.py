@@ -1,6 +1,6 @@
 """
 
-Joint optimisation time series Bradley-Terry model with 3 step, drift 0.9, and prior variance of 15. Runs the model
+Joint optimisation time series Bradley-Terry model with 4 step, drift 0.9, and prior variance of 15. Runs the model
 across 10 processes.
 
 """
@@ -13,14 +13,14 @@ import Queue    # Change to 'queue' for python 3
 from tennismodelling import initialisers
 
 # Output file
-output_file = "../../Outputs/Experiment06/JointOptBradleyTerry_3step_Prior15_drift0_9.csv"
+output_file = "../../Outputs/Experiment06/JointOptBradleyTerry_4step_Prior15_drift0_9.csv"
 provider_model = models.Model()
 
 
 def worker(q_in, q_out):
     """Worker function to compute predictions of each iteration.
     """
-    model = models.JointOptTimeSeriesModel(steps=3,optimiser=optimisers.JointOptTimeSeriesBradleyTerryVariationalInference(steps=3,  prior_var= 15., drift=0.9, tol=1e-8, use_correlations=False))
+    model = models.JointOptTimeSeriesModel(steps=4,optimiser=optimisers.JointOptTimeSeriesBradleyTerryVariationalInference(steps=4,  prior_var= 15., drift=0.9, tol=1e-8, use_correlations=False))
     while 1:
         try:
             item = q_in.get(block=True, timeout=300)  # If idle for 5 minutes assume job finished
