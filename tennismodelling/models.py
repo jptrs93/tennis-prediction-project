@@ -682,6 +682,9 @@ class BayesianRatingModel(object):
             out.append_csv_rows(output_rows, output_file)
             if i % 100 == 0: print('{0}, Iteration: {1}'.format(output_file,i))
 
+    def __iter__(self):
+        return self
+
     def next(self):
         """Computes the next batch of predictions.
 
