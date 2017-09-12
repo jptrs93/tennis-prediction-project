@@ -672,6 +672,16 @@ class BayesianRatingModel(object):
                                     'Carpet' : {'Grass' : 1, 'Clay': 1, 'Carpet' : 1, 'Hard' : 1},
                                     'Hard'   : {'Grass' : 1, 'Clay': 1, 'Carpet' : 1, 'Hard' : 1}}
 
+    def run(self,output_file):
+        """Run the model, writing predictions to an output file.
+
+        Args:
+            output_file (string) : Path to write output to
+        """
+        for i, output_rows in enumerate(self):
+            out.append_csv_rows(output_rows, output_file)
+            if i % 100 == 0: print('{0}, Iteration: {1}'.format(output_file,i))
+
     def next(self):
         """Computes the next batch of predictions.
 
@@ -680,6 +690,10 @@ class BayesianRatingModel(object):
         """
         S, M, E = self.data_provider.next()
         return self.do_iteration(S,M,E)
+
+    # Python 3.x compatibility
+    def __next__(self):
+        return self.next()
 
     def do_iteration(self, S, M, E):
         """Updates skills of players based on the current batch of matches and makes predictions for the next batch.
