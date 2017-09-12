@@ -4,4 +4,5 @@
 **/*.pyc
 .idea/
 tennismodelling.egg-info/
-model_tests.py
+model_tests.py
+remove_duplicates.py
