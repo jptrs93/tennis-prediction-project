@@ -2,4 +2,3 @@
 
 __authors__ = ['Joss Peters']
 
-DEFAULT_SEED = 123456  # Default random number generator seed if none provided.

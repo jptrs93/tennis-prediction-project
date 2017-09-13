@@ -270,11 +270,11 @@ class MatchBradleyTerryModel(OptimisationModel):
         for row in self.data_provider.data[S:M]:
             # Get the outcomes for winning and losing player
             winner_outcome, loser_outcome = self.result_function(row)
-            if winner_outcome != -1 and row[10] in self.players and row[20] in self.players:
-                # weightings
-                recency_weight = self.decay_function(self.prediction_date - row[5])
-                surface_weight = self.surface_weights[self.surface].get(row[2], 0.1)
-                weight = recency_weight *surface_weight
+            # weightings
+            recency_weight = self.decay_function(self.prediction_date - row[5])
+            surface_weight = self.surface_weights[self.surface].get(row[2], 0.05)
+            weight = recency_weight * surface_weight
+            if winner_outcome != -1 and row[10] in self.players and row[20] in self.players and weight > 0:
                 # player index's
                 winner_index = self.players.index(row[10])  # index for winning player
                 loser_index = self.players.index(row[20])  # index for losing player
@@ -662,10 +662,10 @@ class BayesianRatingModel(object):
         self.archive_var = {}       # Skill variances of archived players
 
         if surface_weighting:
-            self.surface_weights = {'Grass'  : {'Grass' : 1, 'Clay': 0.01, 'Carpet' : 0.5, 'Hard' : 0.5},
-                                    'Clay'   : {'Grass' : 0.01, 'Clay': 1, 'Carpet' : 0.1, 'Hard' : 0.1},
-                                    'Carpet' : {'Grass' : 0.5, 'Clay': 0.1, 'Carpet' : 1, 'Hard' : 1},
-                                    'Hard'   : {'Grass' : 0.5, 'Clay': 0.1, 'Carpet' : 1, 'Hard' : 1}}
+            self.surface_weights = {'Grass'  : {'Grass' : 1., 'Clay': 0.01, 'Carpet' : 0.5, 'Hard' : 0.5},
+                                    'Clay'   : {'Grass' : 0.01, 'Clay': 1., 'Carpet' : 0.1, 'Hard' : 0.1},
+                                    'Carpet' : {'Grass' : 0.5, 'Clay': 0.1, 'Carpet' : 1., 'Hard' : 1.},
+                                    'Hard'   : {'Grass' : 0.5, 'Clay': 0.1, 'Carpet' : 1., 'Hard' : 1.}}
         else:
             self.surface_weights = {'Grass'  : {'Grass' : 1, 'Clay': 1, 'Carpet' : 1, 'Hard' : 1},
                                     'Clay'   : {'Grass' : 1, 'Clay': 1, 'Carpet' : 1, 'Hard' : 1},
@@ -680,7 +680,7 @@ class BayesianRatingModel(object):
         """
         for i, output_rows in enumerate(self):
             out.append_csv_rows(output_rows, output_file)
-            if i % 100 == 0: print('{0}, Iteration: {1}'.format(output_file,i))
+            if i % 25 == 0: print('{0}, Iteration: {1}'.format(output_file,i))
 
     def __iter__(self):
         return self
@@ -882,7 +882,7 @@ class BayesianRatingModel(object):
             if w_outcome != -1 and row[10] in self.name_indexes and row[20] in self.name_indexes:
                 winner_index = self.name_indexes[row[10]]  # index for winning player
                 loser_index = self.name_indexes[row[20]]  # index for losing player
-                weight *= self.surface_weights[self.surface].get(row[2],0.1)
+                weight *= self.surface_weights[self.surface].get(row[2], 0.05)
                 if weight > 0:
                     # Update R and W matrices
                     R[winner_index, loser_index] = (R[winner_index, loser_index] * W[

@@ -99,7 +99,7 @@ class GradientOptimiser(BaseOptimiser):
         """
         return w
 
-    def optimise(self, w=None, max_iterations=250, display=False):
+    def optimise(self, w=None, max_iterations=500, display=False):
         """Optimises the model parameters (w).
         
         Args:
@@ -1061,3 +1061,80 @@ class FreeParameterPoint_extrafactors(FreeParameterPointGradient):
         Z2 = 1. / (1 + np.exp(Z1 + bias))
 
         return Z2
+
+class BradleyMultipleFactorGradient(GradientOptimiser):
+
+    def __init__(self, num_factors = 1, *args, **kwargs):
+
+        super(BradleyMultipleFactorGradient,self).__init__(*args, **kwargs)
+        self.num_factors = num_factors
+
+    def set_num_params(self):
+        self.num_params = (self.num_factors * 2 +1)* self.n
+
+    def cost_gradients(self, w):
+        """Gets the cost and gradients for set of parameters w.
+        For function p = 1/(1 + exp(a*d)
+        args:
+            w (vector) : Current player attacking and defensive parameters
+        returns:
+           E (scalar) : Current error of log likilood cost function
+           wBar (N vector) : Gradients with respect to w
+        """
+        S = w[:self.n]
+        # A, D = np.split(np.exp(w[self.n:]), 2)
+        A, D = np.split(w[self.n:], 2)
+        Z0 = A.reshape(-1,self.n,1) * D.reshape(-1,1,self.n)
+        Z2 = np.sum(Z0,axis = 0)
+        Z3 = S[:,None] - S[None,:] + Z2 - Z2.T
+        Z4 = 1. / (1 + np.exp( - Z3))  # Model probabilities
+        ww = np.sum(self.W)  # total weigh
+
+        # Square error cost function
+        if self.error == "square":
+            E = np.sum(self.W * ((Z4 - self.R) ** 2)) / ww
+            Z3Bar = 2 * self.W * (Z4 - self.R) * Z4 * (1 - Z4) / ww
+        else:
+            # LL cost function
+            E = - np.sum(self.W * self.R * np.log(Z4)) / ww
+            Z3Bar = self.R * self.W * (1 - Z4) / ww
+
+        SBar = -np.sum(Z3Bar, axis=1) + np.sum(Z3Bar, axis=0)
+        Z2Bar = Z3Bar - Z3Bar.T
+        Abar = -np.sum(Z2Bar * D.reshape(-1,1,self.n),axis=2).reshape(-1)
+        Dbar = -np.sum(Z2Bar * A.reshape(-1,self.n,1),axis=1).reshape(-1)
+
+        # Dbar = DDbar
+        ADBar = np.append(Abar,Dbar) # *np.exp(w[self.n:])
+        wBar = np.append(SBar, ADBar)
+
+        # Regularisation
+        if self.reg > 0:
+            if self.reg_type == 'L1':
+                E += self.reg * np.sum(np.abs(w))
+                wBar[:] += self.reg*(2 * (w > 0) - 1)
+            else: # L2
+                E += self.reg*np.dot(w,w)
+                wBar += self.reg*2*w
+        return E, wBar
+
+    def optimise(self,*args,**kwargs):
+        """"""
+        ww = []
+        for i in range(5):
+            ww += [GradientOptimiser.optimise(self,*args,**kwargs)]
+
+        return ww
+
+    def get_probabilities(self,ww):
+        Zout = np.zeros_like(self.R)
+        for i, w in enumerate(ww):
+            S = w[:self.n]
+            # A, D = np.split(np.exp(w[self.n:]), 2)
+            A, D = np.split(w[self.n:], 2)
+            Z0 = A.reshape(-1, self.n, 1) * D.reshape(-1, 1, self.n)
+            Z2 = np.sum(Z0, axis=0)
+            Z3 = S[:, None] - S[None, :] + Z2 - Z2.T
+            Z4 = 1. / (1 + np.exp(- Z3))  # Model probabilities
+            Zout += (Z4 - Zout)/(i+1)
+        return Zout

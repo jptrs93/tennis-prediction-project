@@ -6,7 +6,8 @@ Gets a performance summary of models based on their output files.
 
 from tennismodelling import output as out
 
-folders = ["../Outputs/Experiment01",
+folders = ["../",
+           "../Outputs/Experiment01",
            "../Outputs/Experiment02",
            "../Outputs/Experiment03",
            "../Outputs/Experiment04",
@@ -20,7 +21,7 @@ folders = ["../Outputs/Experiment01",
            "../Outputs/Experiment11/FullCovariance"]
 
 # Creates an output processor object for calculating the performance scores.
-processor = out.OutputProcessor(year_start=2013,year_end=2015, min_matches= 0)
+processor = out.OutputProcessor(year_start=2013,year_end=2017, min_matches= 0, odds=3)
 # Print baseline performances.
 processor.print_baselines()
 for folder in folders:

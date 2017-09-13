@@ -54,7 +54,7 @@ class OutputProcessor(object):
     TODO: tidy - structure is messy, parts are not concise, repeated chunks of code etc...
     """
 
-    def __init__(self, min_matches=0, year_start=2013, year_end=2020, odds=3):
+    def __init__(self, min_matches=0, year_start=2013, year_end=2020, odds=1):
         """
         Args:
             min_matches (integer) : Minimum number of matches
@@ -63,6 +63,7 @@ class OutputProcessor(object):
             odds (integer) : Odds to compare the model against. 1 for averaged bookmaker odds, 2 for pinnacle only odds,
                              3 for bet365 only odds, 4 for betfair exchange odds.
         """
+        self.odds = odds
         self.pred_keys = self.get_keys(min_matches,year_start,year_end)
         self.get_odds(odds)
 
@@ -214,16 +215,24 @@ class OutputProcessor(object):
                     w_prob = float(prob)
                     w_odds = self.pred_keys[key][0]
                     l_odds = self.pred_keys[key][1]
+                    if self.odds > 3:
+                        w_odds = 0.95*w_odds + 0.05
+                        l_odds = 0.95*l_odds + 0.05
+
                     diffL = (1. - w_prob) - (1. / l_odds)
                     diffW = w_prob - (1. / w_odds)
-                    margin = 0
-                    if diffL > margin and diffL > diffW:
+                    marginL = 0
+                    marginU = 1
+
+
+                    if diffL > marginL and diffL < marginU and diffL > diffW:
                         profit[0] -= 1
                         profit[1] += 1
-                    elif diffW > margin and diffW > diffL:
+                    elif diffW > marginL and diffW < marginU and diffW > diffL:
                         if w_odds < 1:
                             print('odds error')
-                        profit[0] += (w_odds -1)*0.95
+
+                        profit[0] += (w_odds - 1)
                         profit[1] += 1
                         profit[2] += 1
                     else:
