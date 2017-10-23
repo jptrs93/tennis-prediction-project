@@ -1,4 +1,4 @@
-Summary of Experiments.
+Summary of Experiments. Note experiments were run on a machine with 40 cores.
 
 ### Experiment 1
 Explores a standard exponential decay function for weighting past matches in a Bradley-Terry model based on combined point and game level information.
