@@ -7,7 +7,7 @@ chances. Includes test and comparison against simulated implementation in order 
 """
 
 import numpy as np
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 '----------------------------------------------------------------------------------------------------------------------'
@@ -27,8 +27,19 @@ def game_chance(serveChance):
     Returns
         gameChance (float [0,1]) : Probability of the serving player winning a game
     """
-    return (serveChance**4)+4*(serveChance**4)*((1-serveChance)**1)+10*(serveChance**4)*((1-serveChance)**2)+\
-           20*(serveChance**3)*((1-serveChance)**3)*(serveChance**2)*(1/(1-(2*serveChance*(1-serveChance))))
+    # Chance to win 40-0
+    p40_0 = serveChance**4
+
+    # Chance to win 40-15
+    p40_15 = 4*(serveChance**4)*((1-serveChance)**1)
+
+    # Chance to win 40-30
+    p40_30 = 10*(serveChance**4)*((1-serveChance)**2)
+
+    # Chance to win after deuce
+    pend = 20*(serveChance**3)*((1-serveChance)**3)*(serveChance**2)*(1/(1-(2*serveChance*(1-serveChance))))
+
+    return p40_0 + p40_15 + p40_30 + pend
 
 
 def tie_chance(p1serveChance, p2serveChance):
@@ -42,33 +53,51 @@ def tie_chance(p1serveChance, p2serveChance):
     Returns:
         p1tieChance (float [0,1]) : Probability of player 1 winning a tie break
     """
-    return (p1serveChance**3)*((1-p2serveChance)**4)+4*(p1serveChance**4)*((1-p2serveChance)**3)*p2serveChance+\
-        3*(p1serveChance**3)*((1-p2serveChance)**4)*(1-p1serveChance)+6*(p1serveChance**5)*((1-p2serveChance)**2)*(p2serveChance**2)+\
-        16*(p1serveChance**4)*((1-p2serveChance)**3)*(1-p1serveChance) *(p2serveChance)+\
-        6*(p1serveChance**3)*((1-p2serveChance)**4)*((1-p1serveChance)**2)+\
-        4*(p1serveChance**5)*((1-p1serveChance) **0)*((1-p2serveChance)**2)*(p2serveChance**3)+\
-        30*(p1serveChance**4)*((1-p1serveChance) **1)*((1-p2serveChance)**3)*(p2serveChance**2)+\
-        40*(p1serveChance**3)*((1-p1serveChance) **2)*((1-p2serveChance)**4)*(p2serveChance**1)+\
-        10*(p1serveChance**2)*((1-p1serveChance) **3)*((1-p2serveChance)**5)*(p2serveChance**0)+\
-        5*(p1serveChance**5)*((1-p1serveChance) **0)*((1-p2serveChance)**2)*(p2serveChance**4)+\
-        50*(p1serveChance**4)*((1-p1serveChance) **1)*((1-p2serveChance)**3)*(p2serveChance**3)+\
-        100*(p1serveChance**3)*((1-p1serveChance) **2)*((1-p2serveChance)**4)*(p2serveChance**2)+\
-        50*(p1serveChance**2)*((1-p1serveChance) **3)*((1-p2serveChance)**5)*(p2serveChance**1)+\
-        5*(p1serveChance**1)*((1-p1serveChance) **4)*((1-p2serveChance)**6)*(p2serveChance**0)+\
-        6*(p1serveChance**6)*((1-p1serveChance) **0)*((1-p2serveChance)**1)*(p2serveChance**5)+\
-        75*(p1serveChance**5)*((1-p1serveChance) **1)*((1-p2serveChance)**2)*(p2serveChance**4)+\
-        200*(p1serveChance**4)*((1-p1serveChance) **2)*((1-p2serveChance)**3)*(p2serveChance**3)+\
-        150*(p1serveChance**3)*((1-p1serveChance) **3)*((1-p2serveChance)**4)*(p2serveChance**2)+\
-        30*(p1serveChance**2)*((1-p1serveChance) **4)*((1-p2serveChance)**5)*(p2serveChance**1)+\
-        1*(p1serveChance**1)*((1-p1serveChance) **5)*((1-p2serveChance)**6)*(p2serveChance**0)+\
-        (1*(p1serveChance**6)*((1-p1serveChance) **0)*((1-p2serveChance)**0)*(p2serveChance**6)+
-         36*(p1serveChance**5)*((1-p1serveChance) **1)*((1-p2serveChance)**1)*(p2serveChance**5)+
-         225*(p1serveChance**4)*((1-p1serveChance) **2)*((1-p2serveChance)**2)*(p2serveChance**4)+
-         400*(p1serveChance**3)*((1-p1serveChance) **3)*((1-p2serveChance)**3)*(p2serveChance**3)+
-         225*(p1serveChance**2)*((1-p1serveChance) **4)*((1-p2serveChance)**4)*(p2serveChance**2)+
-         36*(p1serveChance**1)*((1-p1serveChance) **5)*((1-p2serveChance)**5)*(p2serveChance**1)+
-         1*(p1serveChance**0)*((1-p1serveChance) **6)*((1-p2serveChance)**6)*(p2serveChance**0))*\
-        (p1serveChance*(1-p2serveChance))*(1/(1-(p1serveChance*p2serveChance+(1-p1serveChance)*(1-p2serveChance))))
+
+    # Chance to win 7-0
+    p7_0 = (p1serveChance**3)*((1-p2serveChance)**4)
+
+    # Chance to win 7-1
+    p7_1 = 4*(p1serveChance**4)*((1-p2serveChance)**3)*p2serveChance+\
+           3*(p1serveChance**3)*((1-p2serveChance)**4)*(1-p1serveChance)
+
+    # Chance to win 7-2
+    p7_2 = 6*(p1serveChance**5)*((1-p2serveChance)**2)*(p2serveChance**2)+\
+           16*(p1serveChance**4)*((1-p2serveChance)**3)*(1-p1serveChance)*(p2serveChance)+\
+           6*(p1serveChance**3)*((1-p2serveChance)**4)*((1-p1serveChance)**2)
+
+    # Chance to win 7-3
+    p7_3 = 4*(p1serveChance**5)*((1-p1serveChance) **0)*((1-p2serveChance)**2)*(p2serveChance**3)+\
+           30*(p1serveChance**4)*((1-p1serveChance) **1)*((1-p2serveChance)**3)*(p2serveChance**2)+\
+           40*(p1serveChance**3)*((1-p1serveChance) **2)*((1-p2serveChance)**4)*(p2serveChance**1)+\
+           10*(p1serveChance**2)*((1-p1serveChance) **3)*((1-p2serveChance)**5)*(p2serveChance**0)
+
+    # Chance to win 7-4
+    p7_4 = 5*(p1serveChance**5)*((1-p1serveChance) **0)*((1-p2serveChance)**2)*(p2serveChance**4)+\
+           50*(p1serveChance**4)*((1-p1serveChance) **1)*((1-p2serveChance)**3)*(p2serveChance**3)+\
+           100*(p1serveChance**3)*((1-p1serveChance) **2)*((1-p2serveChance)**4)*(p2serveChance**2)+\
+           50*(p1serveChance**2)*((1-p1serveChance) **3)*((1-p2serveChance)**5)*(p2serveChance**1)+\
+           5*(p1serveChance**1)*((1-p1serveChance) **4)*((1-p2serveChance)**6)*(p2serveChance**0)
+
+    # Chance to win 7-5
+    p7_5 = 6*(p1serveChance**6)*((1-p1serveChance) **0)*((1-p2serveChance)**1)*(p2serveChance**5)+\
+           75*(p1serveChance**5)*((1-p1serveChance) **1)*((1-p2serveChance)**2)*(p2serveChance**4)+\
+           200*(p1serveChance**4)*((1-p1serveChance) **2)*((1-p2serveChance)**3)*(p2serveChance**3)+\
+           150*(p1serveChance**3)*((1-p1serveChance) **3)*((1-p2serveChance)**4)*(p2serveChance**2)+\
+           30*(p1serveChance**2)*((1-p1serveChance) **4)*((1-p2serveChance)**5)*(p2serveChance**1)+\
+           1*(p1serveChance**1)*((1-p1serveChance) **5)*((1-p2serveChance)**6)*(p2serveChance**0)
+
+    # Chance to win after 6-6
+    p_end = (1*(p1serveChance**6)*((1-p1serveChance) **0)*((1-p2serveChance)**0)*(p2serveChance**6)+
+             36*(p1serveChance**5)*((1-p1serveChance) **1)*((1-p2serveChance)**1)*(p2serveChance**5)+
+             225*(p1serveChance**4)*((1-p1serveChance) **2)*((1-p2serveChance)**2)*(p2serveChance**4)+
+             400*(p1serveChance**3)*((1-p1serveChance) **3)*((1-p2serveChance)**3)*(p2serveChance**3)+
+             225*(p1serveChance**2)*((1-p1serveChance) **4)*((1-p2serveChance)**4)*(p2serveChance**2)+
+             36*(p1serveChance**1)*((1-p1serveChance) **5)*((1-p2serveChance)**5)*(p2serveChance**1)+
+             1*(p1serveChance**0)*((1-p1serveChance) **6)*((1-p2serveChance)**6)*(p2serveChance**0))*\
+            (p1serveChance*(1-p2serveChance))*(1/(1-(p1serveChance*p2serveChance+(1-p1serveChance)*(1-p2serveChance))))
+
+    return p7_0 + p7_1 + p7_2 + p7_3 + p7_4 + p7_5 + p_end
 
 
 def set_chance(p1Tie, p1Game,p2Game):
@@ -83,21 +112,44 @@ def set_chance(p1Tie, p1Game,p2Game):
     Returns:
         p1tieChance (float [0,1]) : Probability of player 1 winning a set break
     """
-    return (p1Game**3)*((1-p2Game)**3)+3*(p1Game**4)*((1-p2Game)**2)*p2Game+3*(p1Game**3)*((1-p2Game)**3)*(1-p1Game)+\
-        3*(p1Game**4)*((1-p2Game)**2)*(p2Game**2)+12*(p1Game**3)*((1-p2Game)**3)*(1-p1Game)*(p2Game)+\
-        6*(p1Game**2)*((1-p2Game)**4)*((1-p1Game)**2)+4*(p1Game**5)*((1-p1Game)**0)*((1-p2Game)**1)*(p2Game**3)+\
-        24*(p1Game**4)*((1-p1Game)**1)*((1-p2Game)**2)*(p2Game**2)+24*(p1Game**3)*((1-p1Game)**2)*((1-p2Game)**3)*(p2Game**1)+\
-        4*(p1Game**2)*((1-p1Game)**3)*((1-p2Game)**4)*(p2Game**0)+1*(p1Game**5)*((1-p1Game)**0)*((1-p2Game)**1)*(p2Game**4)+\
-        20*(p1Game**4)*((1-p1Game)**1)*((1-p2Game)**2)*(p2Game**3)+60*(p1Game**3)*((1-p1Game)**2)*((1-p2Game)**3)*(p2Game**2)+\
-        40*(p1Game**2)*((1-p1Game)**3)*((1-p2Game)**4)*(p2Game**1)+5*(p1Game**1)*((1-p1Game)**4)*((1-p2Game)**5)*(p2Game**0)+\
-        (1*(p1Game**5)*((1-p1Game)**0)*((1-p2Game)**0)*(p2Game**5)+25*(p1Game**4)*((1-p1Game)**1)*((1-p2Game)**1)*(p2Game**4)+
-         100*(p1Game**3)*((1-p1Game)**2)*((1-p2Game)**2)*(p2Game**3)+100*(p1Game**2)*((1-p1Game)**3)*((1-p2Game)**3)*(p2Game**2)+
-         25*(p1Game**1)*((1-p1Game)**4)*((1-p2Game)**4)*(p2Game**1)+1*(p1Game**0)*((1-p1Game)**5)*((1-p2Game)**5)*(p2Game**0))*(p1Game)*(1-p2Game)+\
-        (1*(p1Game**5)*((1-p1Game)**0)*((1-p2Game)**0)*(p2Game**5)+25*(p1Game**4)*((1-p1Game)**1)*((1-p2Game)**1)*(p2Game**4)+
-         100*(p1Game**3)*((1-p1Game)**2)*((1-p2Game)**2)*(p2Game**3)+100*(p1Game**2)*((1-p1Game)**3)*((1-p2Game)**3)*(p2Game**2)+
-         25*(p1Game**1)*((1-p1Game)**4)*((1-p2Game)**4)*(p2Game**1)+
-         1*(p1Game**0)*((1-p1Game)**5)*((1-p2Game)**5)*(p2Game**0))*(p1Game*p2Game+(1-p1Game)*(1-p2Game))*p1Tie
 
+    # Chance to win 6-0
+    p6_0 = (p1Game**3)*((1-p2Game)**3)
+
+    # Chance to win 6-1
+    p6_1 = 3*(p1Game**4)*((1-p2Game)**2)*p2Game+\
+           3*(p1Game**3)*((1-p2Game)**3)*(1-p1Game)
+
+    # Chance to win 6-2
+    p6_2 = 3*(p1Game**4)*((1-p2Game)**2)*(p2Game**2)+\
+           12*(p1Game**3)*((1-p2Game)**3)*(1-p1Game)*(p2Game)+\
+           6*(p1Game**2)*((1-p2Game)**4)*((1-p1Game)**2)
+
+    # Chance to win 6-3
+    p6_3 = 4*(p1Game**5)*((1-p1Game)**0)*((1-p2Game)**1)*(p2Game**3)+\
+           24*(p1Game**4)*((1-p1Game)**1)*((1-p2Game)**2)*(p2Game**2)+\
+           24*(p1Game**3)*((1-p1Game)**2)*((1-p2Game)**3)*(p2Game**1)+\
+           4*(p1Game**2)*((1-p1Game)**3)*((1-p2Game)**4)*(p2Game**0)
+
+    # Chance to win 6-4
+    p6_4 = 1*(p1Game**5)*((1-p1Game)**0)*((1-p2Game)**1)*(p2Game**4)+\
+           20*(p1Game**4)*((1-p1Game)**1)*((1-p2Game)**2)*(p2Game**3)+\
+           60*(p1Game**3)*((1-p1Game)**2)*((1-p2Game)**3)*(p2Game**2)+\
+           40*(p1Game**2)*((1-p1Game)**3)*((1-p2Game)**4)*(p2Game**1)+\
+           5*(p1Game**1)*((1-p1Game)**4)*((1-p2Game)**5)*(p2Game**0)
+
+    # Chance to win 7-5
+    p7_5 = (1*(p1Game**5)*((1-p1Game)**0)*((1-p2Game)**0)*(p2Game**5)+25*(p1Game**4)*((1-p1Game)**1)*((1-p2Game)**1)*(p2Game**4)+
+            100*(p1Game**3)*((1-p1Game)**2)*((1-p2Game)**2)*(p2Game**3)+100*(p1Game**2)*((1-p1Game)**3)*((1-p2Game)**3)*(p2Game**2)+
+            25*(p1Game**1)*((1-p1Game)**4)*((1-p2Game)**4)*(p2Game**1)+1*(p1Game**0)*((1-p1Game)**5)*((1-p2Game)**5)*(p2Game**0))*(p1Game)*(1-p2Game)
+
+    # Chance to win 7-6
+    p7_6 = (1*(p1Game**5)*((1-p1Game)**0)*((1-p2Game)**0)*(p2Game**5)+25*(p1Game**4)*((1-p1Game)**1)*((1-p2Game)**1)*(p2Game**4)+
+            100*(p1Game**3)*((1-p1Game)**2)*((1-p2Game)**2)*(p2Game**3)+100*(p1Game**2)*((1-p1Game)**3)*((1-p2Game)**3)*(p2Game**2)+
+            25*(p1Game**1)*((1-p1Game)**4)*((1-p2Game)**4)*(p2Game**1)+
+            1*(p1Game**0)*((1-p1Game)**5)*((1-p2Game)**5)*(p2Game**0))*(p1Game*p2Game+(1-p1Game)*(1-p2Game))*p1Tie
+
+    return p6_0 + p6_1 + p6_2 + p6_3 + p6_4 + p7_5 + p7_6
 
 def match_chance_sets(p1set,no_sets=3): # closed form match chance from game probabilities
     """
@@ -316,13 +368,15 @@ def sim_match(p1serve,p2serve, no_loops=2000, no_sets=3):
 #     m = match_chance(p1s,p2s)
 #     m2 = []
 #     for p1 in p1s:
-#         m2.append(sim_match(p1,p2s,5000))
+#         m2.append(sim_match(p1,p2s,300))
 #     ax_1.plot(p1s,m,label="closed form")
 #     ax_1.plot(p1s,m2,label="simulated")
 #     ax_1.set_title("Match Chance vs Serve Chance (for fixed opponent serve chance of 0.5")
 #     ax_1.set_ylim(-0.1,1.1)
 #     ax_1.legend(loc='best')
 #     plt.show()
+
+
 #
 #
 # def test2():
